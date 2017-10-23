@@ -5,7 +5,7 @@ const queryString = require('querystring');
 
 const APPID = 'wx3e1d175a787899bd';
 const SECRET = '65c96753bb7b0bf6499c2df882b2c55a';
-const HOST = 'https://api.weixin.qq.com';
+const HOST = 'api.weixin.qq.com';
 const PATH = '/sns/jscode2session';
 
 
@@ -26,8 +26,17 @@ router.route('/login')
 	let wxReq = https.request(option, (res) => {
 		console.log('request wxopenid');
 		if(res.statusCode == 200){
-			console.log(res);
+			console.log(Object.keys(res));
 			console.log(res.bady);
+			let json = '';
+			res.on('data',(data) => {
+				json+=data;
+			});
+			res.on('end',() => {
+				json = JSON.parse(json);
+				console.log(json);
+			});
+			
 		}
 	});
 
