@@ -20,7 +20,7 @@ httpsServer.listen(443,() =>{
 	console.log('listening 443 port');
 });
 
-app.use('/login',login);
+app.use(login);
 app.get('/', (req , res) =>{
 	console.log('someone requested!');
 	res.cookie('mycookie','value',{time : new Date()});
