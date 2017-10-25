@@ -1,6 +1,7 @@
 const https = require('https');
 const fs = require('fs');
 const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
 const app = require('express')();
 const login = require('./routes/login');
 // var http = require('http');
@@ -15,6 +16,7 @@ var options = {
 };
 
 app.use(cookieParser());
+app.use(bodyParser());
 const httpsServer = https.createServer(options,app);
 httpsServer.listen(443,() =>{
 	console.log('listening 443 port');
