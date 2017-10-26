@@ -55,6 +55,9 @@ router.route('/login')
 				validTime : {type: Number, default: 7200}
 			}); 
 			let SessionModel = mongoose.model('session',sessionSchema);
+			SessionModel.find((err, sessions) => {
+				console.log(sessions);
+			});			
 			let instance = new SessionModel();
 			instance.sessionId = json.openid + json.session_key;
 			instance.save((err) => {
@@ -66,7 +69,6 @@ router.route('/login')
 	wxReq.end();
 	console.log(queryString.stringify(DATA));
 	//wxReq.write(queryString.stringify(data));
-
 	res.status(200).send('ok');
 	next();
 });

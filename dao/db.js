@@ -8,6 +8,7 @@ connection.once('open', (err) => {
 		console.log('Database connection failure');
 	}else{
 		console.log('Database opened');
+
 	}
 });
 
