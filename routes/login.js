@@ -43,26 +43,37 @@ router.route('/login')
 		res.on('end',() => {
 			json = JSON.parse(json);
 			console.log(json);
+			
 			//user集合模式
 			let userSchema = new mongoose.Schema({
 				openId : {type: String},
 			});
 			let UserModel = mongoose.model('user',userSchema);
-			let user = new UserModel();
-			let sessionSchema = new mongoose.Schema({
-				sessionId : {type:String},
-				time: {type: Date , default: Date.now}
-				validTime : {type: Number, default: 7200}
-			}); 
-			let SessionModel = mongoose.model('session',sessionSchema);
-			SessionModel.find((err, sessions) => {
-				console.log(sessions);
-			});			
-			let instance = new SessionModel();
-			instance.sessionId = json.openid + json.session_key;
-			instance.save((err) => {
-				console.log(err);
+
+			UserModel.find({openId:json.openid}, (results) => {
+				if(results.length == 0){
+					  let user = new UserModel();
+					  user.openId = json.openid;
+					  user.save((err) => {
+					  	console.log('save an user success!');
+					  });
+				}
 			});
+
+			// let sessionSchema = new mongoose.Schema({
+			// 	sessionId : {type:String},
+			// 	time: {type: Date , default: Date.now}
+			// 	validTime : {type: Number, default: 7200}
+			// }); 
+			// let SessionModel = mongoose.model('session',sessionSchema);
+			// SessionModel.find((err, sessions) => {
+			// 	console.log(sessions);
+			// });			
+			// let instance = new SessionModel();
+			// instance.sessionId = json.openid + json.session_key;
+			// instance.save((err) => {
+			// 	console.log(err);
+			// });
 		});
 	}
 	});
