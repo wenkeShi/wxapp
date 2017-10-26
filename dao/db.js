@@ -1,11 +1,13 @@
 const mongoose = require('mongoose');
 
-const connection = mongoose.connect('mongodb://127.0.0.1/wxapp');
+mongoose.connect('mongodb://127.0.0.1/wxapp');
 
-// const connection = mongoose.connection;
-connection.on('connected', (err) => {
+const connection = mongoose.connection;
+connection.once('open', (err) => {
 	if(err){
 		console.log('Database connection failure');
+	}else{
+		console.log('Database opened');
 	}
 });
 

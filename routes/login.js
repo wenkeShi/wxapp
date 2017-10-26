@@ -29,41 +29,44 @@ router.route('/login')
 	let code = req.query.code;
 	DATA.js_code = code;
 	OPTION.path += queryString.stringify(DATA);
-	if(req.header.sessionId){
-		
-	}else{
-		let wxReq = https.request(OPTION, (res) => {
-		// console.log('request wxopenid');
-		if(res.statusCode == 200){
-			console.log(Object.keys(res));
-			// console.log(res.bady);
-			let json = '';
+	let wxReq = https.request(OPTION, (res) => {
+	// console.log('request wxopenid');
+	if(res.statusCode == 200){
+		console.log(Object.keys(res));
+		// console.log(res.bady);
+		let json = '';
 
-			res.on('data',(data) => {
-				json+=data;
-			});
+		res.on('data',(data) => {
+			json+=data;
+		});
 
-			res.on('end',() => {
-				json = JSON.parse(json);
-				console.log(json);
-				let sessionSchema = new mongoose.Schema({
-					sessionId : {type:String},
-					time: {type: Date , default: Date.now}
-					validTime : {type: Number, default: 7200}
-				});
-				let SessionModel = mongoose.model('session',sessionSchema);
-				let instance = new SessionModel();
-				instance.sessionId = json.openid + json.session_key;
-				instance.save((err) => {
-					console.log(err);
-				});
+		res.on('end',() => {
+			json = JSON.parse(json);
+			console.log(json);
+			//user集合模式
+			let userSchema = new mongoose.Schema({
+				openId : {type: String},
 			});
-		}
-	});
+			let UserModel = mongoose.model('user',userSchema);
+			let user = new UserModel();
+			let sessionSchema = new mongoose.Schema({
+				sessionId : {type:String},
+				time: {type: Date , default: Date.now}
+				validTime : {type: Number, default: 7200}
+			}); 
+			let SessionModel = mongoose.model('session',sessionSchema);
+			let instance = new SessionModel();
+			instance.sessionId = json.openid + json.session_key;
+			instance.save((err) => {
+				console.log(err);
+			});
+		});
 	}
-	console.log(queryString.stringify(data));
-	//wxReq.write(queryString.stringify(data));
+	});
 	wxReq.end();
+	console.log(queryString.stringify(DATA));
+	//wxReq.write(queryString.stringify(data));
+
 	res.status(200).send('ok');
 	next();
 });
