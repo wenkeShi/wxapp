@@ -3,8 +3,10 @@ const router = express.Router();
 const https = require('https');
 const queryString = require('querystring');
 const DB = require('../dao/db');
+const Model = require('../dao/model');
 const DB_CONNECTION = DB.connection;
 const mongoose = DB.mongoose;
+const UserModel = Model.UserModel;
 
 const APPID = 'wx3e1d175a787899bd';
 const SECRET = '65c96753bb7b0bf6499c2df882b2c55a';
@@ -43,14 +45,14 @@ router.route('/login')
 		res.on('end',() => {
 			json = JSON.parse(json);
 			console.log(json);
-			
-			//user集合模式
-			let userSchema = new mongoose.Schema({
-				openId : {type: String},
-			});
-			let UserModel = mongoose.model('user',userSchema);
 
-			UserModel.find({openId:json.openid}, (results) => {
+			//user集合模式
+			// let userSchema = new mongoose.Schema({
+			// 	openId : {type: String},
+			// });
+			// let UserModel = mongoose.model('user',userSchema);
+
+			UserModel.find({openId:json.openid}, (err,results) => {
 				if(results.length == 0){
 					  let user = new UserModel();
 					  user.openId = json.openid;
