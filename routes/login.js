@@ -48,10 +48,13 @@ router.route('/login')
 				console.log(json);
 				let sessionSchema = new mongoose.Schema({
 					sessionId : {type:String},
-					time: {type: Date , default: Date.now}
+					time: {type: Date , default: Date.now},
 					validTime : {type: Number, default: 7200}
 				});
 				let SessionModel = mongoose.model('session',sessionSchema);
+				SessionModel.find((err, sessions) => {
+					console.log(sessions);
+				});
 				let instance = new SessionModel();
 				instance.sessionId = json.openid + json.session_key;
 				instance.save((err) => {
@@ -60,10 +63,11 @@ router.route('/login')
 			});
 		}
 	});
-	}
-	console.log(queryString.stringify(data));
-	//wxReq.write(queryString.stringify(data));
 	wxReq.end();
+	}
+	console.log(queryString.stringify(DATA));
+	//wxReq.write(queryString.stringify(data));
+	
 	res.status(200).send('ok');
 	next();
 });
