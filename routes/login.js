@@ -11,7 +11,7 @@ const UserModel = Model.UserModel;
 const APPID = 'wx3e1d175a787899bd';
 const SECRET = '65c96753bb7b0bf6499c2df882b2c55a';
 const HOST = 'api.weixin.qq.com';
-const PATH = '/sns/jscode2session';
+const PATH = '/sns/jscode2session?';
 
 
 const DATA = {
@@ -22,15 +22,44 @@ const DATA = {
 };
 const OPTION = {
 		host : HOST,
-		path : PATH + '?',
+		path : '',
 		method : 'GET',
 };
 
-router.route('/login')
+const sessions = {};
+
+router.route('/')
 .get((req, res, next) => {
+	let sessionId = req.header.sessionId;
+	if(sessionId){
+		console.log(sessions[sessionId]);
+		next();
+	}else{
+		let code = req.query.code;
+		let otherRes = res;
+		DATA.js_code = code;
+		OPTION.path = PATH + queryString.stringify(DATA);
+		let wxReq = https.request(OPTION, (res) => {
+			if(res.statusCode == 200){
+				console.log(res.bady);
+				let openId = res.body.openid;
+				sessions[openId] = openId;
+				otherRes.json({
+					data : {sessionId : openId},
+				});
+			}
+		});
+		wxReq.end();
+		res.status(200);
+		res.type('application/json');
+		next();
+})
+
+
+.get('login',(req, res, next) => {
 	let code = req.query.code;
 	DATA.js_code = code;
-	OPTION.path += queryString.stringify(DATA);
+	OPTION.path = PATH + queryString.stringify(DATA);
 	let wxReq = https.request(OPTION, (res) => {
 	// console.log('request wxopenid');
 	if(res.statusCode == 200){
@@ -84,6 +113,11 @@ router.route('/login')
 	//wxReq.write(queryString.stringify(data));
 	res.status(200).send('ok');
 	next();
+})
+
+
+.post('publish', (req, res, next) => {
+	
 });
 
 
