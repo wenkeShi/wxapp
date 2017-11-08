@@ -33,12 +33,12 @@ router.all('*',(req, res, next) => {
 	//console.log(req);
 	//headers里的字段以全部被转为小写
 	let sessionId = req.headers.sessionid;
-	if(sessionId&&sessions[sessionId]){
+	if(sessionId){
 		console.log(sessions[sessionId]);
+		sessions[sessionId] = sessionId;
 		next();
 	}else{
 		console.log('no sessionid');
-		
 		let code = req.query.code;
 		console.log(code );
 		let otherRes = res;
@@ -65,6 +65,7 @@ router.all('*',(req, res, next) => {
 			}
 		});
 		wxReq.end();
+
 		//res.status(200);
 		//res.type('application/json');
 	}
