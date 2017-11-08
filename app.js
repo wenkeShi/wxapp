@@ -16,7 +16,7 @@ var options = {
 };
 
 app.use(cookieParser());
-app.use(bodyParser());
+app.use(bodyParser.json());
 const httpsServer = https.createServer(options,app);
 httpsServer.listen(443,() =>{
 	console.log('listening 443 port');
