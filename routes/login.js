@@ -8,6 +8,7 @@ const Model = require('../dao/model');
 const DB_CONNECTION = DB.connection;
 const mongoose = DB.mongoose;
 const UserModel = Model.UserModel;
+const BookModel = Model.BookModel;
 
 const APPID = 'wx3e1d175a787899bd';
 const SECRET = '65c96753bb7b0bf6499c2df882b2c55a';
@@ -134,8 +135,18 @@ router.all('*',(req, res, next) => {
 })
 
 
-.post('publish', (req, res, next) => {
-	
+.post('/publish', (req, res, next) => {
+	let sessionId = req.headers.sessionid;
+	let openid = sessions[sessionid];
+	let data = req.body;
+	console.log(data);
+	let book = new BookModel(data);
+	book.save();
+	UserModel.find({openid : openid} , (err, results) => {
+		console.log(results[0]);
+		results[0].publishedBooks.push(book);
+		results[0].save();
+	});
 });
 
 
