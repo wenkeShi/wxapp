@@ -137,16 +137,15 @@ router.all('*',(req, res, next) => {
 
 .post('/publish', (req, res, next) => {
 	let sessionId = req.headers.sessionid;
-	let openid = sessions[sessionid];
+	let openid = sessions[sessionId];
 	let data = req.body;
-	console.log(data);
 	let book = new BookModel(data);
 	book.save();
-	UserModel.find({openid : openid} , (err, results) => {
-		console.log(results[0]);
+	UserModel.find({openId : openid} , (err, results) => {
 		results[0].publishedBooks.push(book);
 		results[0].save();
 	});
+	res.status(200).end();
 });
 
 

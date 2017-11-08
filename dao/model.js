@@ -16,12 +16,12 @@ const BookSchma = new Schema({
 	author : String,
 	rate : String,
 	tags : String,
-	status : true,
+	status : {type : Boolean,default : true},
 	ownerId : String,
 	borrowerId : String,
 });
 const userModel =  mongoose.model('user' , UserSchema);
-const bookModel = mongooose.model('book' , BookSchma);
+const bookModel = mongoose.model('book' , BookSchma);
 
 module.exports = {
 	UserModel  : userModel,
