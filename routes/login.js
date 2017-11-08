@@ -31,6 +31,7 @@ const sessions = {};
 router.use(bodyParser.json());
 router.all('*',(req, res, next) => {
 	//console.log(req);
+	//headers里的字段以全部被转为小写
 	let sessionId = req.headers.sessionid;
 	if(sessionId){
 		console.log(sessions[sessionId]);
@@ -59,54 +60,54 @@ router.all('*',(req, res, next) => {
 					otherRes.json({
 						data : {'sessionId' : openId},
 					});
-					
 					otherRes.status(200);
-					
 				});
-
 			}
 		});
 		wxReq.end();
 		//res.status(200);
 		//res.type('application/json');
-		
 	}
 })
 .get('/login',(req, res, next) => {			
-let code = req.query.code;
-	DATA.js_code = code;
-	OPTION.path = PATH + queryString.stringify(DATA);
-	let wxReq = https.request(OPTION, (res) => {
+// let code = req.query.code;
+// 	DATA.js_code = code;
+// 	OPTION.path = PATH + queryString.stringify(DATA);
+// 	let wxReq = https.request(OPTION, (res) => {
 	// console.log('request wxopenid');
-	if(res.statusCode == 200){
-		console.log(Object.keys(res));
+	// if(res.statusCode == 200){
+	// 	console.log(Object.keys(res));
 		// console.log(res.bady);
-		let json = '';
+		// let json = '';
 
-		res.on('data',(data) => {
-			json+=data;
-		});
+		// res.on('data',(data) => {
+		// 	json+=data;
+		// });
 
-		res.on('end',() => {
-			json = JSON.parse(json);
-			console.log(json);
+		// res.on('end',() => {
+		// 	json = JSON.parse(json);
+		// 	console.log(json);
 
 			//user集合模式
 			// let userSchema = new mongoose.Schema({
 			// 	openId : {type: String},
 			// });
 			// let UserModel = mongoose.model('user',userSchema);
+			let sessionId = req.headers.sessionid;
 
-			UserModel.find({openId:json.openid}, (err,results) => {
+			UserModel.find({openId:session[sessionId]}, (err,results) => {
 				if(results.length == 0){
 					  let user = new UserModel();
 					  user.openId = json.openid;
 					  user.save((err) => {
 					  	console.log('save an user success!');
 					  });
+				}else{
+					console.log('user had exist');
 				}
 			});
 
+			res.status(200);
 			// let sessionSchema = new mongoose.Schema({
 			// 	sessionId : {type:String},
 			// 	time: {type: Date , default: Date.now}
@@ -121,13 +122,13 @@ let code = req.query.code;
 			// instance.save((err) => {
 			// 	console.log(err);
 			// });
-		});
-	}
-	});
-	wxReq.end();
-	console.log(queryString.stringify(DATA));
+	// 	});
+	// }
+	// });
+	// wxReq.end();
+	// console.log(queryString.stringify(DATA));
 	//wxReq.write(queryString.stringify(data));
-	res.status(200).send('ok');
+	// res.status(200).send('ok');
 	next();
 })
 
