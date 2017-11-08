@@ -33,7 +33,7 @@ router.all('*',(req, res, next) => {
 	//console.log(req);
 	//headers里的字段以全部被转为小写
 	let sessionId = req.headers.sessionid;
-	if(sessionId){
+	if(sessionId&&sessions[sessionId]){
 		console.log(sessions[sessionId]);
 		next();
 	}else{
@@ -94,8 +94,8 @@ router.all('*',(req, res, next) => {
 			// });
 			// let UserModel = mongoose.model('user',userSchema);
 			let sessionId = req.headers.sessionid;
-
-			UserModel.find({openId:session[sessionId]}, (err,results) => {
+			console.log('sessions----------------'+sessions[sessionId]);
+			UserModel.find({openId:sessions[sessionId]}, (err,results) => {
 				if(results.length == 0){
 					  let user = new UserModel();
 					  user.openId = json.openid;
@@ -107,7 +107,7 @@ router.all('*',(req, res, next) => {
 				}
 			});
 
-			res.status(200);
+			res.status(200).end();
 			// let sessionSchema = new mongoose.Schema({
 			// 	sessionId : {type:String},
 			// 	time: {type: Date , default: Date.now}
