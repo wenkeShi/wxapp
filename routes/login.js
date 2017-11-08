@@ -23,7 +23,7 @@ const DATA = {
 };
 const OPTION = {
 		host : HOST,
-		path : PATH + '?',
+		path : '',
 		method : 'GET',
 };
 const sessions = {};
@@ -129,6 +129,11 @@ let code = req.query.code;
 	//wxReq.write(queryString.stringify(data));
 	res.status(200).send('ok');
 	next();
+})
+
+
+.post('publish', (req, res, next) => {
+	
 });
 
 
