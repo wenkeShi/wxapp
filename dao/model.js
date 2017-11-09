@@ -16,6 +16,7 @@ const BookSchma = new Schema({
 	author : String,
 	rate : String,
 	tags : String,
+	image : String,
 	status : {type : Boolean,default : true},
 	ownerId : String,
 	borrowerId : String,

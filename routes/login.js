@@ -146,7 +146,20 @@ router.all('*',(req, res, next) => {
 		results[0].save();
 	});
 	res.status(200).end();
+})
+
+.get('/publishedbooks',(req, res, next) => {
+	let sessionId = req.headers.sessionid;
+	let openid = sessions[sessionId];
+	UserModel.find({openId : openid} , (err, results) => {
+		res.type('application/json');
+		res.json({
+			publishedBooks : results[0].publishedBooks
+		});
+		res.status(200).end();
+	});
 });
+
 
 
 module.exports = router;
