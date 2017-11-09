@@ -148,6 +148,7 @@ router.all('*',(req, res, next) => {
 		results[0].save();
 	});
 	res.status(200).end();
+	next();
 })
 
 .get('/publishedbooks',(req, res, next) => {
@@ -171,7 +172,8 @@ router.all('*',(req, res, next) => {
 			books : results
 		});
 		res.status(200).end();
-	}); 
+	});
+	next(); 
 });
 
 module.exports = router;
