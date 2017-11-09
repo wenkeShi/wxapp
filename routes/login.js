@@ -96,11 +96,12 @@ router.all('*',(req, res, next) => {
 			// });
 			// let UserModel = mongoose.model('user',userSchema);
 			let sessionId = req.headers.sessionid;
+			let openId = sessions[sessionId];
 			console.log('sessions----------------'+sessions[sessionId]);
-			UserModel.find({openId:sessions[sessionId]}, (err,results) => {
+			UserModel.find({openId:openId}, (err,results) => {
 				if(results.length == 0){
 					  let user = new UserModel();
-					  user.openId = json.openid;
+					  user.openId = openId;
 					  user.save((err) => {
 					  	console.log('save an user success!');
 					  });
@@ -140,9 +141,10 @@ router.all('*',(req, res, next) => {
 	let openid = sessions[sessionId];
 	let data = req.body;
 	let book = new BookModel(data);
+	book.ownerId = openid;
 	book.save();
 	UserModel.find({openId : openid} , (err, results) => {
-		results[0].publishedBooks.push(book);
+		results[0].publishedBooks.unshift(book);
 		results[0].save();
 	});
 	res.status(200).end();
@@ -158,8 +160,18 @@ router.all('*',(req, res, next) => {
 		});
 		res.status(200).end();
 	});
+	next();
+})
+
+.get('/books', (req, res, next) => {
+	let condition = req.query.tag;
+	bookModel.find({tags : /condition/ig}, (err, results) => {
+		res.type('application/json');
+		res.json({
+			books : results
+		});
+		res.status(200).end();
+	}); 
 });
-
-
 
 module.exports = router;
