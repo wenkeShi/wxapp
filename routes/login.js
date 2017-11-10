@@ -155,11 +155,12 @@ router.all('*',(req, res, next) => {
 	let sessionId = req.headers.sessionid;
 	let openid = sessions[sessionId];
 	UserModel.find({openId : openid} , (err, results) => {
-		res.type('application/json');
+		// res.type('application/json');  用res.json可省略这步
 		res.json({
 			publishedBooks : results[0].publishedBooks
 		});
-		res.status(200).end();
+		// res.status(200).end();    res.end()用于不带数据的快速返回请求 如果要带数据，用res.json 或者res.send
+		res.status(200);
 	});
 	next();
 })
@@ -167,11 +168,11 @@ router.all('*',(req, res, next) => {
 .get('/books', (req, res, next) => {
 	let condition = req.query.tag;
 	bookModel.find({tags : /condition/ig}, (err, results) => {
-		res.type('application/json');
+		// res.type('application/json');
 		res.json({
 			books : results
 		});
-		res.status(200).end();
+		res.status(200);
 	});
 	next(); 
 });
