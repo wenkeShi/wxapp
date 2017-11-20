@@ -10,6 +10,7 @@ const mongoose = DB.mongoose;
 const UserModel = Model.UserModel;
 const BookModel = Model.BookModel;
 
+
 const APPID = 'wx3e1d175a787899bd';
 const SECRET = '65c96753bb7b0bf6499c2df882b2c55a';
 const HOST = 'api.weixin.qq.com';
@@ -163,9 +164,9 @@ router.all('*',(req, res, next) => {
 		res.status(200).json({
 			publishedBooks : results[0].publishedBooks
 		});
-		next();
+		next();       //next()一定是在异步处理完之后调用        
 	});
-	
+	//next() 这里用next的话会在查找的异步结果返回之前就执行next,这就可能导致查找结果返回前服务器就已经返回响应数据了。
 }) 
 
 .get('/books', (req, res, next) => {

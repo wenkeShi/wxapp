@@ -2,8 +2,10 @@ const https = require('https');
 const fs = require('fs');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+const WebSocket = require('ws');
 const app = require('express')();
 const login = require('./routes/login');
+
 // var http = require('http');
 
 //获取认证证书
@@ -35,6 +37,15 @@ app.get('/cookie',(req , res) => {
 	console.log(req.cookies);
 	//var mycookie = req.cookies.mycookie;
 	res.end('mycookie');
+});
+const wss = new WebSocket.Server({server : httpsServer});
+
+wss.on('connection',(wss, req) => {
+    console.log('someone connect');
+    wss.on('message' , (msg) => {
+        console.log(msg);
+    });
+    wss.send('hello');
 });
 
 // app.get('/login',(req,res)  => {
