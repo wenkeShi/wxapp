@@ -39,20 +39,11 @@ app.get('/cookie',(req , res) => {
 	//var mycookie = req.cookies.mycookie;
 	res.end('mycookie');
 });
-const wss = new WebSocket.Server({server : httpsServer});
 
-wss.on('connection',(ws, req) => {
-console.log(req.url);
-console.log(queryString.parse(req.url));
-console.log(ws.data);
-    console.log('someone connect');
-    console.log(wss.clients.length);
-    ws.on('message' , (msg) => {
-        console.log(msg);
-	wss.send('you send '+msg);
-    });
-    ws.send('hello');
-});
+
+module.exports={
+    server : httpsServer,
+};
 
 // app.get('/login',(req,res)  => {
 // 	res.status(200);

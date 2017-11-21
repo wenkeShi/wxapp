@@ -3,12 +3,19 @@ const router = express.Router();
 const https = require('https');
 const queryString = require('querystring');
 const bodyParser = require('body-parser');
+const URL = require('url');
+
+
 const DB = require('../dao/db');
 const Model = require('../dao/model');
+const httpsServer = require('../app').server;
+
+
 const DB_CONNECTION = DB.connection;
 const mongoose = DB.mongoose;
 const UserModel = Model.UserModel;
 const BookModel = Model.BookModel;
+
 
 
 const APPID = 'wx3e1d175a787899bd';
@@ -29,6 +36,28 @@ const OPTION = {
 		method : 'GET',
 };
 const sessions = {};
+
+const wss = new WebSocket.Server({server : httpsServer});
+
+wss.on('connection',(ws, req) => {
+		let sessionId = queryString.parse(URL.parse(req.url).query).sessionId;
+		ws.id = sessionId;
+    console.log('someone connect');
+    console.log(Object.keys(wss.clients));
+    wss.clients.forEach((client) => {
+    	console.log(Object,keys(client));
+    });
+
+    ws.on('message' , (msg) => {
+    		let msg = JSON.parse(msg);
+    		if(sessions[msg.targetId]){
+    			
+    		}
+        console.log(msg);
+				wss.send('you send '+msg);
+    });
+    ws.send('hello');
+});
 
 router.use(bodyParser.json());
 router.all('*',(req, res, next) => {
@@ -72,6 +101,8 @@ router.all('*',(req, res, next) => {
 		//res.type('application/json');
 	}
 })
+
+
 .get('/login',(req, res, next) => {			
 // let code = req.query.code;
 // 	DATA.js_code = code;
