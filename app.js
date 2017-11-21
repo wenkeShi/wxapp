@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const WebSocket = require('ws');
 const app = require('express')();
 const login = require('./routes/login');
+const queryString = require('querystring');
 
 // var http = require('http');
 
@@ -40,12 +41,17 @@ app.get('/cookie',(req , res) => {
 });
 const wss = new WebSocket.Server({server : httpsServer});
 
-wss.on('connection',(wss, req) => {
+wss.on('connection',(ws, req) => {
+console.log(req.url);
+console.log(queryString.parse(req.url));
+console.log(ws.data);
     console.log('someone connect');
-    wss.on('message' , (msg) => {
+    console.log(wss.clients.length);
+    ws.on('message' , (msg) => {
         console.log(msg);
+	wss.send('you send '+msg);
     });
-    wss.send('hello');
+    ws.send('hello');
 });
 
 // app.get('/login',(req,res)  => {
