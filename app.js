@@ -2,10 +2,14 @@ const https = require('https');
 const fs = require('fs');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-const WebSocket = require('ws');
 const app = require('express')();
-const login = require('./routes/login');
 const queryString = require('querystring');
+const URL = require('url');
+const WebSocket = require('ws');
+
+const login = require('./routes/login');
+const  router = login.router;
+let  sessions = login.sessions;
 
 // var http = require('http');
 
@@ -26,7 +30,7 @@ httpsServer.listen(443,() =>{
 	console.log('listening 443 port');
 });
 
-app.use(login);
+app.use(router);
 
 app.get('/', (req , res) =>{
 	console.log('someone requested!');
@@ -41,9 +45,28 @@ app.get('/cookie',(req , res) => {
 });
 
 
-module.exports={
-    server : httpsServer,
-};
+const wss = new WebSocket.Server({server : httpsServer});
+
+wss.on('connection',(ws, req) => {
+		let sessionId = queryString.parse(URL.parse(req.url).query).sessionId;
+		ws.id = sessionId;
+    console.log('someone connect');
+    console.log(wss.clients);
+    wss.clients.forEach((client) => {
+    	console.log(Object.keys(client));
+    });
+
+    ws.on('message' , (msg) => {
+    		let msgObj = JSON.parse(msg);
+    		if(sessions[msgObj.targetId]){
+    			
+    		}
+        console.log(msg);
+				ws.send('you send '+msg);
+    });
+    ws.send('hello');
+});
+
 
 // app.get('/login',(req,res)  => {
 // 	res.status(200);
