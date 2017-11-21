@@ -59,12 +59,20 @@ wss.on('connection',(ws, req) => {
     ws.on('message' , (msg) => {
     		let msgObj = JSON.parse(msg);
     		if(sessions[msgObj.targetId]){
-    			
+    			wss.clients.forEach((client) => {
+				if(client.id === msgObj.targetId){
+					let data = {
+						nickName :msgObj.nickName, 
+						bookName :msgObj.bookName,
+					};
+					client.send(JSON.stringify(data));
+				}
+			});
     		}
         console.log(msg);
-				ws.send('you send '+msg);
+				//ws.send('you send '+msg);
     });
-    ws.send('hello');
+    //ws.send('hello');
 });
 
 
