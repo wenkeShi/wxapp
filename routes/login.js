@@ -183,7 +183,7 @@ router.all('*',(req, res, next) => {
 	let condition = req.query.tag;
 	if(condition=="all") condition='.';
 	let reg = new RegExp(condition,'i');
-	BookModel.find({tags : reg}, (err, results) => {
+	BookModel.find({tags : reg,status : true}, (err, results) => {
 		// res.type('application/json');
 		res.json({
 			books : results
@@ -191,8 +191,44 @@ router.all('*',(req, res, next) => {
 		res.status(200);
 		next();
 	});
-});
+})
 
-module.exports = {router : router,
+.get('/book/status', (req, res, next) => {
+	let isbn = req.query.isbn;
+	let canBorrow = 0;
+	BookModel.find({isbn:isbn},(err, results) => {
+		results.forEach((book) => {
+		  book.status ? canBorrow++ : null;
+		});
+		res.status(200).json({
+			canBorrow : canBorrow,
+			total : results.length,
+		});
+		next();
+	});
+})
+
+.get('/book/ownerId',(req, res, next) => {
+		let bookId = req.query.bookId;
+		BookModel.findOne({_id : bookId},(err, result) => {
+			res.status(200).json({
+				ownerId : result.ownerId,
+			});
+			next();
+		});
+})
+
+.get('/borrowBook',(req, res, next) => {
+	let bookId = req.query.bookId;
+	BookModel.findOne({_id : bookId} , (err, result) => {
+		result.status = false;
+		result.save((err) => {
+			if(!err) req.status(200).end();
+		});
+	});
+})
+  
+module.exports = {
+	router : router,
 	sessions  : sessions,
 };
