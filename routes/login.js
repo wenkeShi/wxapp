@@ -146,7 +146,7 @@ router.all('*',(req, res, next) => {
 	next();
 })
 
-
+//发布书籍
 .post('/publish', (req, res, next) => {
 	let sessionId = req.headers.sessionid;
 	let openid = sessions[sessionId];
@@ -162,23 +162,25 @@ router.all('*',(req, res, next) => {
 	next();
 })
 
+//获取发布的图书
 .get('/publishedbooks',(req, res, next) => {
 	let sessionId = req.headers.sessionid;
 	let openid = sessions[sessionId];
-	UserModel.find({openId : openid} , (err, results) => {
+	UserModel.findOne({openId : openid} , (err, user) => {
 		// res.type('application/json');  用res.json可省略这步
 		//res.json({
 		//	publishedBooks : results[0].publishedBooks
 		//});
 		//res.status(200).end();    //res.end()用于不带数据的快速返回请求 如果要带数据，用res.json 或者res.send
 		res.status(200).json({
-			publishedBooks : results[0].publishedBooks
+			publishedBooks : user.publishedBooks 
 		});
 		next();       //next()一定是在异步处理完之后调用        
 	});
 	//next() 这里用next的话会在查找的异步结果返回之前就执行next,这就可能导致查找结果返回前服务器就已经返回响应数据了。
 }) 
 
+//获取某类书籍
 .get('/books', (req, res, next) => {
 	let condition = req.query.tag;
 	if(condition=="all") condition='.';
@@ -193,6 +195,7 @@ router.all('*',(req, res, next) => {
 	});
 })
 
+//查询书籍可借的状态
 .get('/book/status', (req, res, next) => {
 	let isbn = req.query.isbn;
 	let canBorrow = 0;
@@ -208,6 +211,7 @@ router.all('*',(req, res, next) => {
 	});
 })
 
+//获取书籍主人信息
 .get('/book/ownerId',(req, res, next) => {
 		let bookId = req.query.bookId;
 		BookModel.findOne({_id : bookId},(err, result) => {
@@ -218,16 +222,94 @@ router.all('*',(req, res, next) => {
 		});
 })
 
-.get('/borrowBook',(req, res, next) => {
-	let bookId = req.query.bookId;
-	BookModel.findOne({_id : bookId} , (err, result) => {
-		result.status = false;
-		result.save((err) => {
-			if(!err) res.status(200).end();
-		});
+//借阅书籍接口
+.post('/borrowBook',(req, res, next) => {
+	let borrowedBook = req.body;
+	let bookId = borrowedBook.bookId;
+	let userId = sessions[req.headers.sessionid];
+
+	BookModel.findOne({_id : bookId} , (err, book) => {
+		if(!err){
+			book.status = false;
+			book.save((err) => {
+				if(err){
+					console.log('save book failed!');
+				}
+			});
+			UserModel.findOne({openId : userId}, (err, user) => {
+				if(!err){
+					borrowedBook.borrowingStatus = '申请借阅中';
+					borrowBookd.borrowerId = userId;
+					//添加微信号和手机号
+					user.borrowedBooks.unshift(borrowedBook);
+					user.save((err) => {
+						if(!err){
+							res.status(200).end();
+							next();
+						}else{
+							console.log('save user failed!');
+						}
+					});
+				}else{
+					console.log('find user failed!');
+				}
+			});
+		}else{
+			console.log('find book failed!');
+		}
+	});	
+})
+
+//获取借阅的书籍
+get('/borrowedbooks' , (req, res, next) => {
+	let userId = sessions[req.headers.sessionid];
+	UserModel.findOne({openId : userId} , (err, user) => {
+		if(!err){
+			res.status(200).json({
+				borrowedBooks : user.borrowedBooks,
+			});
+			next();
+		}else{
+			console.log('find user failed!');
+		}
+	});
+});
+
+//新增借阅消息
+post('/borrowMsg', (req, res, next) => {
+	let userId = sessions[req.headers.sessionid],
+	let msgData = req.body;
+	let targetId = msgData.targetId;
+	msgData.borrowerId = userId;
+	UserModel.findOne({openId : targetId}, (err, user) => {
+		if(!err){
+			user.borrowMessages.unshift(msgData);
+			user.save((err) => {
+				if(!err){
+					res.status(200).send();
+					next();
+				}else{
+					console.log('user save failed!');
+				}
+			});
+		}else{
+			console.log('find user failed!');
+		}
 	});
 })
-  
+
+//获取借阅消息
+get('/message/borrowMsgs', (req, res, next) => {
+	let userId = sessions[req.headers.sessionid];
+	UserModel.findOne({openId : userId} , (err, user) => {
+		res.status(200).json({
+			borrowMessages : user.borrowMessages,
+		});
+		next();
+	});
+});
+
+
 module.exports = {
 	router : router,
 	sessions  : sessions,
