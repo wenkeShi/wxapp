@@ -223,7 +223,7 @@ router.all('*',(req, res, next) => {
 	BookModel.findOne({_id : bookId} , (err, result) => {
 		result.status = false;
 		result.save((err) => {
-			if(!err) req.status(200).end();
+			if(!err) res.status(200).end();
 		});
 	});
 })
