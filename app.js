@@ -62,8 +62,9 @@ wss.on('connection',(ws, req) => {
     			wss.clients.forEach((client) => {
 				if(client.id === msgObj.targetId){
 					let data = {
-						nickName :msgObj.nickName, 
-						bookName :msgObj.bookName,
+						time : msjObj.time,
+						borrower :msgObj.nickName, 
+						book :msgObj.bookName,
 					};
 					client.send(JSON.stringify(data));
 				}

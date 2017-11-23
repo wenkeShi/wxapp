@@ -236,32 +236,35 @@ router.all('*',(req, res, next) => {
 					console.log('save book failed!');
 				}
 			});
+
+		}else{
+			console.log('find book failed!');
+		}
+	});
 			UserModel.findOne({openId : userId}, (err, user) => {
 				if(!err){
 					borrowedBook.borrowingStatus = '申请借阅中';
-					borrowBookd.borrowerId = userId;
+					borrowedBook.borrowerId = userId;
 					//添加微信号和手机号
 					user.borrowedBooks.unshift(borrowedBook);
-					user.save((err) => {
+					user.markModified('borrowedBooks');
+					 user.save((err) => {
 						if(!err){
 							res.status(200).end();
 							next();
 						}else{
 							console.log('save user failed!');
+							console.log(err);
 						}
 					});
 				}else{
 					console.log('find user failed!');
 				}
-			});
-		}else{
-			console.log('find book failed!');
-		}
-	});	
+			});	
 })
 
 //获取借阅的书籍
-get('/borrowedbooks' , (req, res, next) => {
+.get('/borrowedbooks' , (req, res, next) => {
 	let userId = sessions[req.headers.sessionid];
 	UserModel.findOne({openId : userId} , (err, user) => {
 		if(!err){
@@ -273,23 +276,28 @@ get('/borrowedbooks' , (req, res, next) => {
 			console.log('find user failed!');
 		}
 	});
-});
+})
 
 //新增借阅消息
-post('/borrowMsg', (req, res, next) => {
-	let userId = sessions[req.headers.sessionid],
+.post('/borrowMsg', (req, res, next) => {
+	let userId = sessions[req.headers.sessionid];
 	let msgData = req.body;
 	let targetId = msgData.targetId;
-	msgData.borrowerId = userId;
+	msgData.borrowerId = userId;   //前端传了bookid才能save成功？！不知道为什么
+console.log(targetId);
 	UserModel.findOne({openId : targetId}, (err, user) => {
 		if(!err){
+			console.log(user);
 			user.borrowMessages.unshift(msgData);
+			user.markModified('borrowMessages');
+			console.log(user.borrowMessages);
 			user.save((err) => {
 				if(!err){
 					res.status(200).send();
 					next();
 				}else{
-					console.log('user save failed!');
+					console.log(err);
+					console.log('save user failed!');
 				}
 			});
 		}else{
@@ -299,7 +307,7 @@ post('/borrowMsg', (req, res, next) => {
 })
 
 //获取借阅消息
-get('/message/borrowMsgs', (req, res, next) => {
+.get('/message/borrowMsgs', (req, res, next) => {
 	let userId = sessions[req.headers.sessionid];
 	UserModel.findOne({openId : userId} , (err, user) => {
 		res.status(200).json({
