@@ -65,6 +65,8 @@ wss.on('connection',(ws, req) => {
 						time : msgObj.time,
 						borrower :msgObj.nickName, 
 						book :msgObj.bookName,
+						borrowerId : sessions[sessionId],
+						bookId : msgObj.bookId,
 					};
 					client.send(JSON.stringify(data));
 				}

@@ -315,7 +315,172 @@ console.log(targetId);
 		});
 		next();
 	});
-});
+})
+//同意借阅
+.post('/agree',(req, res, next) => {
+	let body = req.body;
+	let userId = sessions[req.headers.sessionid];
+	let bookId = body.bookId;
+	UserModel.findOne({openId : userId}, (err, owner) =>{
+		if(!err){
+			for(let i=0;i<owner.publishedBooks.length;i++){
+console.log('--------------------------------------------------------------------------------------');
+				console.log(owner.publishedBooks[i]._id);
+				console.log(bookId);
+				if(owner.publishedBooks[i]._id == bookId){
+				console.log('find----------------------------------------------------------------');
+			  	owner.publishedBooks[i].borrower = body.borrower;
+			  	owner.publishedBooks[i].borrowerId = body.borrowerId; //可以考虑加上borrowId
+			  	break;
+			  }
+			}
+			for(let i=0;i<owner.borrowMessages.length;i++){
+				if(owner.borrowMessages[i].bookId == bookId){
+					owner.borrowMessages.splice(i,1);
+					break;
+				}
+			}
+			console.log(owner.publishedBooks);
+			owner.markModified('publishedBooks');
+			owner.markModified('borrowMessages');
+			owner.save((err) => {if(err) console.log(err)});
+		}else{
+			console.log(err);
+		}
+	});
+	UserModel.findOne({openId : body.borrowerId}, (err, borrower) => {
+		if(!err){
+			for(let i=0;i<borrower.borrowedBooks.length;i++){
+				if(borrower.borrowedBooks[i].bookId == bookId){
+				console.log('--------------------------------------------borrowedBooks')
+				borrower.borrowedBooks[i].borrowingStatus = '借阅中';
+			  	borrower.borrowedBooks.set(i,borrower.borrowedBooks[i]);
+				//borrower.markModified('borrowedBooks');
+			borrower.save((err) => {console.log('----------------------------errro');if(err) console.log(err)});
+			res.status(200).send();
+			next();
+			  	break;
+			  }
+			}
+			console.log(borrower.borrowedBooks);
+			//borrower.markModified('borrowedBooks.borrowingStatus ');
+			//borrower.borrowedBooks.splice(0,0);
+
+		}else{
+			console.log(err);
+		}
+	});
+})
+
+
+//拒绝借阅
+.post('/reject', (req, res, next) => {
+	let body = req.body;
+	let userId = sessions[req.headers.sessionid];
+	let bookId = body.bookId;
+	UserModel.findOne({openId : userId}, (err, owner) =>{
+		if(!err){
+			for(let i=0;i<owner.borrowMessages.length;i++){
+				if(owner.borrowMessages[i].bookId == bookId){
+					owner.borrowMessages.splice(i,1);
+					break;
+				}
+			}
+			owner.markModified('borrowMessages');
+			owner.save();
+		}else{
+			console.log(err);
+		}
+	});
+	UserModel.findOne({openId : body.borrowerId}, (err, borrower) => {
+		if(!err){
+			for(let i=0;i<borrower.borrowedBooks.length;i++){
+				if(borrower.borrowedBooks[i].bookId == bookId){
+			  	borrower.borrowedBooks[i].borrowingStatus = '借阅失败';
+			  	break;
+			  }
+			}
+			borrower.markModified('borrowedBooks');
+			borrower.save();
+			res.status(200).send();
+		}else{
+			console.log(err);
+		}
+	});
+	BookModel.findOne({_id : bookId}, (err, book) => {
+		book.status = true;
+		book.save();
+		res.status(200).send();
+		next();
+	});
+})
+
+//归还书籍
+.get('/returnbook', (req, res, next) => {
+	let userId = sessions[req.headers.sessionid];
+	let bookId = req.query.bookId;
+	UserModel.findOne({openId : userId}, (err, user) => {
+		if(!err){
+			for(let i=0;i<user.borrowedBooks.length;i++){
+				if(user.borrowedBooks[i].bookId == bookId){
+			  	user.borrowedBooks[i].borrowingStatus = '归还中';
+			  	break;
+			  }
+			}
+			user.markModified('borrowedBooks');
+			user.save();
+			res.status(200).send();
+			next();
+		}else{
+			console.log(err);
+		}
+	});
+})
+
+//收到书籍
+.post('/receivebook',(req, res, next) => {
+	let userId = sessions[req.headers.sessionid];
+	let body = req.body;
+	let bookId = body.bookId;
+	let borrowerId = body.borrowerId;
+	UserModel.findOne({openId : userId}, (err, owner) =>{
+		if(!err){
+			for(let i=0;i<owner.publishedBooks.length;i++){
+				if(owner.publishedBooks[i]._id == bookId){
+			  	owner.publishedBooks[i].borrower = '';
+			  	owner.publishedBooks[i].borrowerId = ''; //可以考虑加上borrowId
+			  	break;
+			  }
+			}
+			owner.markModified('publishedBooks');
+			owner.save();
+		}else{
+			console.log(err);
+		}
+	});
+	UserModel.findOne({openId : borrowerId}, (err, borrower) => {
+		if(!err){
+			for(let i=0;i<borrower.borrowedBooks.length;i++){
+				if(borrower.borrowedBooks[i].bookId == bookId){
+			  	borrower.borrowedBooks[i].borrowingStatus = '已归还';
+			  	break;
+			  }
+			}
+			borrower.markModified('borrowedBooks');
+			borrower.save();
+			res.status(200).send();
+			next();
+		}else{
+			console.log(err);
+		}
+	});
+	BookModel.findOne({_id : bookId}, (err, book) => {
+		book.status = true;
+		book.save();
+		res.status(200).send();
+		next();
+	});
+})
 
 
 module.exports = {
