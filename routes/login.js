@@ -194,7 +194,19 @@ router.all('*',(req, res, next) => {
 		next();
 	});
 })
-
+//获取最新发布的图书
+.get('/newbooks', (req, res, next) => {
+	BookModel.find({status : true}, (err, books) => {
+		if(err){
+			console.log(err);
+		}else{
+			res.status(200).json({
+				"newPublishedBooks" : books.slice(-6)
+			});
+		}
+	});
+	
+})
 //查询书籍可借的状态
 .get('/book/status', (req, res, next) => {
 	let isbn = req.query.isbn;
@@ -212,16 +224,35 @@ router.all('*',(req, res, next) => {
 })
 
 //获取书籍主人信息
-.get('/book/ownerId',(req, res, next) => {
+.get('/book/ownerInfo',(req, res, next) => {
 		let bookId = req.query.bookId;
-		BookModel.findOne({_id : bookId},(err, result) => {
+		BookModel.findOne({_id : bookId},(err, book) => {
+			console.log(book);
+			console.log( book.owner+book.ownerImage);
 			res.status(200).json({
-				ownerId : result.ownerId,
+				ownerId : book.ownerId,
+				owner : book.owner,
+				ownerImage : book.ownerImage,
 			});
 			next();
 		});
 })
-
+//获取书主发布的图书
+.get('/owner/publishedbooks', (req, res, next) => {
+	let ownerId = req.query.ownerId;
+	UserModel.findOne({openId : ownerId} , (err, owner) => {
+		if(err){
+			console.log(err);
+		}else{
+			res.status(200).json({
+				"publishedBooks" : owner.publishedBooks
+			});
+			next();
+		}
+	});
+	
+	
+})
 //借阅书籍接口
 .post('/borrowBook',(req, res, next) => {
 	let borrowedBook = req.body;
@@ -229,18 +260,13 @@ router.all('*',(req, res, next) => {
 	let userId = sessions[req.headers.sessionid];
 
 	BookModel.findOne({_id : bookId} , (err, book) => {
-		if(!err){
+		if(!err&&book.status){     //保证书籍还未被借阅
 			book.status = false;
 			book.save((err) => {
 				if(err){
 					console.log('save book failed!');
 				}
 			});
-
-		}else{
-			console.log('find book failed!');
-		}
-	});
 			UserModel.findOne({openId : userId}, (err, user) => {
 				if(!err){
 					borrowedBook.borrowingStatus = '申请借阅中';
@@ -261,6 +287,17 @@ router.all('*',(req, res, next) => {
 					console.log('find user failed!');
 				}
 			});	
+
+		}else{
+			res.status(200).json({
+				error : '已被借阅'
+			});
+			next();
+			//console.log('find book failed!');
+			return;
+		}
+	});
+			
 })
 
 //获取借阅的书籍
@@ -327,10 +364,11 @@ console.log(targetId);
 console.log('--------------------------------------------------------------------------------------');
 				console.log(owner.publishedBooks[i]._id);
 				console.log(bookId);
-				if(owner.publishedBooks[i]._id == bookId){
+				if(owner.publishedBooks[i]._id == bookId){  //_id是ObjectId类型的
 				console.log('find----------------------------------------------------------------');
 			  	owner.publishedBooks[i].borrower = body.borrower;
 			  	owner.publishedBooks[i].borrowerId = body.borrowerId; //可以考虑加上borrowId
+				owner.publishedBooks.unshift(owner.publishedBooks.splice(i,1)[0]); //将被借阅的书籍调到借阅书籍最前
 			  	break;
 			  }
 			}
@@ -348,26 +386,33 @@ console.log('-------------------------------------------------------------------
 			console.log(err);
 		}
 	});
-	UserModel.findOne({openId : body.borrowerId}, (err, borrower) => {
+	//UserModel.findOne({openId : body.borrowerId}, (err, borrower) => {
+	//	if(!err){
+	//		for(let i=0;i<borrower.borrowedBooks.length;i++){
+	//			if(borrower.borrowedBooks[i].bookId == bookId){
+	//			console.log('--------------------------------------------borrowedBooks')
+	//			borrower.borrowedBooks[i].borrowingStatus = '借阅中';
+	//		  	borrower.borrowedBooks.set(i,borrower.borrowedBooks[i]);
+	//			//borrower.markModified('borrowedBooks');
+	//		borrower.save((err) => {console.log('----------------------------errro');if(err) console.log(err)});
+	//		res.status(200).send();
+	//		next();
+	//		  	break;
+	//		  }
+	//		}
+	//		console.log(borrower.borrowedBooks);
+	//		//borrower.markModified('borrowedBooks.borrowingStatus ');
+	//		//borrower.borrowedBooks.splice(0,0);
+
+	//	}else{
+	//		console.log(err);
+	//	}
+	//});
+	//UserModel.findOne
+	UserModel.update({openId : body.borrowerId, "borrowedBooks.bookId" : bookId}, {$set: {"borrowedBooks.$.borrowingStatus" : '借阅中' } } ,(err, result) => {
 		if(!err){
-			for(let i=0;i<borrower.borrowedBooks.length;i++){
-				if(borrower.borrowedBooks[i].bookId == bookId){
-				console.log('--------------------------------------------borrowedBooks')
-				borrower.borrowedBooks[i].borrowingStatus = '借阅中';
-			  	borrower.borrowedBooks.set(i,borrower.borrowedBooks[i]);
-				//borrower.markModified('borrowedBooks');
-			borrower.save((err) => {console.log('----------------------------errro');if(err) console.log(err)});
 			res.status(200).send();
 			next();
-			  	break;
-			  }
-			}
-			console.log(borrower.borrowedBooks);
-			//borrower.markModified('borrowedBooks.borrowingStatus ');
-			//borrower.borrowedBooks.splice(0,0);
-
-		}else{
-			console.log(err);
 		}
 	});
 })
@@ -392,19 +437,25 @@ console.log('-------------------------------------------------------------------
 			console.log(err);
 		}
 	});
-	UserModel.findOne({openId : body.borrowerId}, (err, borrower) => {
+//	UserModel.findOne({openId : body.borrowerId}, (err, borrower) => {
+//		if(!err){
+//			for(let i=0;i<borrower.borrowedBooks.length;i++){
+//				if(borrower.borrowedBooks[i].bookId == bookId){
+//			  	borrower.borrowedBooks[i].borrowingStatus = '借阅失败';
+//			  	break;
+//			  }
+//			}
+//			borrower.markModified('borrowedBooks');
+//			borrower.save();
+//			res.status(200).send();
+//		}else{
+//			console.log(err);
+//		}
+//	});
+	UserModel.update({openId : body.borrowerId, "borrowedBooks.bookId" : bookId}, {$set: {"borrowedBooks.$.borrowingStatus" : '借阅失败' } } ,(err, result) => {
 		if(!err){
-			for(let i=0;i<borrower.borrowedBooks.length;i++){
-				if(borrower.borrowedBooks[i].bookId == bookId){
-			  	borrower.borrowedBooks[i].borrowingStatus = '借阅失败';
-			  	break;
-			  }
-			}
-			borrower.markModified('borrowedBooks');
-			borrower.save();
 			res.status(200).send();
-		}else{
-			console.log(err);
+			next();
 		}
 	});
 	BookModel.findOne({_id : bookId}, (err, book) => {
@@ -458,20 +509,26 @@ console.log('-------------------------------------------------------------------
 			console.log(err);
 		}
 	});
-	UserModel.findOne({openId : borrowerId}, (err, borrower) => {
+//	UserModel.findOne({openId : borrowerId}, (err, borrower) => {
+//		if(!err){
+//			for(let i=0;i<borrower.borrowedBooks.length;i++){
+//				if(borrower.borrowedBooks[i].bookId == bookId){
+//			  	borrower.borrowedBooks[i].borrowingStatus = '已归还';
+//			  	break;
+//			  }
+//			}
+//			borrower.markModified('borrowedBooks');
+//			borrower.save();
+//			res.status(200).send();
+//			next();
+//		}else{
+//			console.log(err);
+//		}
+//	});
+	UserModel.update({openId : borrowerId, "borrowedBooks.bookId" : bookId}, {$set: {"borrowedBooks.$.borrowingStatus" : '已归还' } } ,(err, result) => {
 		if(!err){
-			for(let i=0;i<borrower.borrowedBooks.length;i++){
-				if(borrower.borrowedBooks[i].bookId == bookId){
-			  	borrower.borrowedBooks[i].borrowingStatus = '已归还';
-			  	break;
-			  }
-			}
-			borrower.markModified('borrowedBooks');
-			borrower.save();
 			res.status(200).send();
 			next();
-		}else{
-			console.log(err);
 		}
 	});
 	BookModel.findOne({_id : bookId}, (err, book) => {

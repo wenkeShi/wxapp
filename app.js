@@ -67,6 +67,9 @@ wss.on('connection',(ws, req) => {
 						book :msgObj.bookName,
 						borrowerId : sessions[sessionId],
 						bookId : msgObj.bookId,
+						wxNum : msgObj.wxNum,
+						phoneNum : msgObj.phoneNum,
+						msg : msgObj.msg
 					};
 					client.send(JSON.stringify(data));
 				}

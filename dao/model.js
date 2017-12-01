@@ -20,6 +20,8 @@ const BookSchma = new Schema({
 	image : String,
 	status : {type : Boolean,default : true},
 	ownerId : String,
+	owner : String,
+	ownerImage : String,
 	//borrowerId : String,
 });
 // const BorrowMsgSchma = new Schema({
