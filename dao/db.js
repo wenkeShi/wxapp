@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://127.0.0.1/wxapp');
+mongoose.connect('mongodb://wxapp:a15572290839@127.0.0.1/wxapp');
 
 const connection = mongoose.connection;
 connection.once('open', (err) => {
