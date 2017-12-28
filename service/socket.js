@@ -5,7 +5,7 @@ let  sessions = login.sessions;
 
 
 
-module.exports = (httpServer) = {
+module.exports = (httpServer) => {
 
 	const wss = new WebSocket.Server({server : httpServer});
 
