@@ -1,5 +1,5 @@
 const WebSocket = require('ws');
-const login = require('./routes/login');
+const login = require('../routes/login');
 // const  router = login.router;
 let  sessions = login.sessions;
 
