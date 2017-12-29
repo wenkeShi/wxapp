@@ -27,7 +27,7 @@ const OPTION = {
 		method : 'GET',
 };
 
-module.export = (req, res, next) => {
+module.exports = (req, res, next) => {
 	//console.log(req);
 	//headers里的字段以全部被转为小写
 	// let sessionId = req.headers.sessionid;
