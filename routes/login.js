@@ -14,7 +14,7 @@ const sessions = require('../service/session');
 //接口服务
 const register = require('../service/register');
 const login = require('../service/login');
-
+const publish = require('../service/publish');
 
 const DB_CONNECTION = DB.connection;
 const mongoose = DB.mongoose;
@@ -48,20 +48,7 @@ router.get('/register', register)
 .get('/login',login)
 
 //发布书籍
-.post('/publish', (req, res, next) => {
-	let sessionId = req.headers.sessionid;
-	let openid = sessions[sessionId];
-	let data = req.body;
-	let book = new BookModel(data);
-	book.ownerId = openid;
-	book.save();
-	UserModel.find({openId : openid} , (err, results) => {
-		results[0].publishedBooks.unshift(book);
-		results[0].save();
-	});
-	res.status(200).end();
-	next();
-})
+.post('/publish', publish)
 
 //获取发布的图书
 .get('/publishedbooks',(req, res, next) => {
