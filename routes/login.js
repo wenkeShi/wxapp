@@ -9,7 +9,7 @@ const bodyParser = require('body-parser');
 
 const DB = require('../dao/db');
 const Model = require('../dao/model');
-const sessions = require('../session');
+const sessions = require('../service/session');
 
 //接口服务
 const register = require('../service/register');
