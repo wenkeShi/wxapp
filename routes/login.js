@@ -39,7 +39,7 @@ var   sessions = {};
 
 
 router.use(bodyParser.json());
-router.all('*',(req, res, next) => {
+router.get('/register',(req, res, next) => {
 	//console.log(req);
 	//headers里的字段以全部被转为小写
 	let sessionId = req.headers.sessionid;
@@ -50,7 +50,7 @@ router.all('*',(req, res, next) => {
 	}else{
 		console.log('no sessionid');
 		let code = req.query.code;
-		console.log(code );
+		console.log(code ); 
 		let otherRes = res;
 		DATA.js_code = code;
 		OPTION.path = PATH + queryString.stringify(DATA);
@@ -59,7 +59,7 @@ router.all('*',(req, res, next) => {
 				let json = '';
 				res.on('data' , (data) => {
 					json+=data;
-				});
+				}); 
 				res.on('end' , () => {
 					console.log(json);
 					json =JSON.parse(json);
@@ -70,7 +70,7 @@ router.all('*',(req, res, next) => {
 					otherRes.json({
 						data : {'sessionId' : openId},
 					});
-					otherRes.status(200);
+					otherRes.status(200); 
 				});
 			}
 		});
