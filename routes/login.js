@@ -9,6 +9,10 @@ const bodyParser = require('body-parser');
 
 const DB = require('../dao/db');
 const Model = require('../dao/model');
+const sessions = require('../session');
+
+//接口服务
+const register = require('../service/register');
 
 
 const DB_CONNECTION = DB.connection;
@@ -35,51 +39,11 @@ const OPTION = {
 		path : '',
 		method : 'GET',
 };
-var   sessions = {};
+// var   sessions = {};
 
 
 router.use(bodyParser.json());
-router.get('/register',(req, res, next) => {
-	//console.log(req);
-	//headers里的字段以全部被转为小写
-	let sessionId = req.headers.sessionid;
-	if(sessionId){
-		console.log(sessions[sessionId]);
-		sessions[sessionId] = sessionId;
-		next();
-	}else{
-		console.log('no sessionid');
-		let code = req.query.code;
-		console.log(code ); 
-		let otherRes = res;
-		DATA.js_code = code;
-		OPTION.path = PATH + queryString.stringify(DATA);
-		let wxReq = https.request(OPTION, (res) => {
-			if(res.statusCode == 200){
-				let json = '';
-				res.on('data' , (data) => {
-					json+=data;
-				}); 
-				res.on('end' , () => {
-					console.log(json);
-					json =JSON.parse(json);
-					let openId = json.openid;
-					sessions[openId] = openId;
-					console.log(openId);
-					otherRes.type('application/json');
-					otherRes.json({
-						data : {'sessionId' : openId},
-					});
-					otherRes.status(200); 
-				});
-			}
-		});
-		wxReq.end();
-
-		//res.status(200);
-		//res.type('application/json');
-	}
-})
+router.get('/register', register)
 
 
 .get('/login',(req, res, next) => {			

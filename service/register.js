@@ -1,6 +1,6 @@
 const DB = require('../dao/db');
 const Model = require('../dao/model');
-
+const sessions = require('./session');
 
 const DB_CONNECTION = DB.connection;
 const mongoose = DB.mongoose;
@@ -27,17 +27,16 @@ const OPTION = {
 		method : 'GET',
 };
 
-const sessions = {};
-
-
 module.export = (req, res, next) => {
-	let sessionId = req.headers.sessionid;
-	if(sessionId){
-		console.log(sessions[sessionId]);
-		sessions[sessionId] = sessionId;
-		next();
-	}else{
-		console.log('no sessionid');
+	//console.log(req);
+	//headers里的字段以全部被转为小写
+	// let sessionId = req.headers.sessionid;
+	// if(sessionId){
+	// 	console.log(sessions[sessionId]);
+	// 	sessions[sessionId] = sessionId;
+	// 	next();
+	// }else{
+		// console.log('no sessionid');
 		let code = req.query.code;
 		console.log(code );
 		let otherRes = res;
@@ -64,4 +63,7 @@ module.export = (req, res, next) => {
 			}
 		});
 		wxReq.end();
+	//res.status(200);
+	//res.type('application/json');
+	// }
 };
