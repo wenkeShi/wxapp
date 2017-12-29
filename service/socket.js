@@ -2,7 +2,6 @@ const WebSocket = require('ws');
 const login = require('../routes/login');
 const queryString = require('querystring');
 const URL = require('url');
-// const  router = login.router;
 const sessions = require('./session');
 
 

@@ -1,22 +1,12 @@
 const https = require('https');
 const queryString = require('querystring');
 
-// const DB = require('../dao/db');
-// const Model = require('../dao/model');
 const sessions = require('./session');
-
-// const DB_CONNECTION = DB.connection;
-// const mongoose = DB.mongoose;
-// const UserModel = Model.UserModel;
-// const BookModel = Model.BookModel;
-
-
 
 const APPID = 'wx3e1d175a787899bd';
 const SECRET = '65c96753bb7b0bf6499c2df882b2c55a';
 const HOST = 'api.weixin.qq.com';
 const PATH = '/sns/jscode2session?';
-
 
 const DATA = {
 		appid : APPID,
@@ -24,6 +14,7 @@ const DATA = {
 		js_code : '',
 		grant_type : 'authorization_code',
 };
+
 const OPTION = {
 		host : HOST,
 		path : '',
