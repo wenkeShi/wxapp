@@ -21,6 +21,9 @@ var options = {
 	cert : cert,
 };
 
+//配置小程序二维码生成文件
+app.use('/index', express.static('index'));
+
 app.use(cookieParser());
 app.use(bodyParser.json());
 
