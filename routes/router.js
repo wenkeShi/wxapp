@@ -430,5 +430,4 @@ console.log('-------------------------------------------------------------------
 
 module.exports = {
 	router : router,
-	sessions  : sessions,
 };

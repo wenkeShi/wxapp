@@ -8,9 +8,7 @@ const URL = require('url');
 // const WebSocket = require('ws');
 const socket = require('./service/socket');
 
-const login = require('./routes/login');
-const  router = login.router;
-let  sessions = login.sessions;
+const router = require('./routes/router').router;
 
 // var http = require('http');
 
