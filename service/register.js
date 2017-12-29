@@ -1,11 +1,13 @@
-const DB = require('../dao/db');
-const Model = require('../dao/model');
+const queryString = require('querystring');
+
+// const DB = require('../dao/db');
+// const Model = require('../dao/model');
 const sessions = require('./session');
 
-const DB_CONNECTION = DB.connection;
-const mongoose = DB.mongoose;
-const UserModel = Model.UserModel;
-const BookModel = Model.BookModel;
+// const DB_CONNECTION = DB.connection;
+// const mongoose = DB.mongoose;
+// const UserModel = Model.UserModel;
+// const BookModel = Model.BookModel;
 
 
 
