@@ -16,6 +16,7 @@ const register = require('../service/register');
 const login = require('../service/login');
 const publish = require('../service/publish');
 const getPublishBooks = require('../service/getPublishBooks');
+const getBooks = require('../service/getBooks');
 
 const DB_CONNECTION = DB.connection;
 const mongoose = DB.mongoose;
@@ -33,19 +34,8 @@ router.get('/register', register)
 .get('/publishedbooks',getPublishBooks) 
 
 //获取某类书籍
-.get('/books', (req, res, next) => {
-	let condition = req.query.tag;
-	if(condition=="all") condition='.';
-	let reg = new RegExp(condition,'i');
-	BookModel.find({tags : reg,status : true}, (err, results) => {
-		// res.type('application/json');
-		res.json({
-			books : results
-		});
-		res.status(200);
-		next();
-	});
-})
+.get('/books', getBooks)
+
 //获取最新发布的图书
 .get('/newbooks', (req, res, next) => {
 	BookModel.find({status : true}, (err, books) => {
