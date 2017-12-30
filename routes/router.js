@@ -17,6 +17,7 @@ const login = require('../service/login');
 const publish = require('../service/publish');
 const getPublishBooks = require('../service/getPublishBooks');
 const getBooks = require('../service/getBooks');
+const getNewBooks = require('../service/getNewBooks');
 
 const DB_CONNECTION = DB.connection;
 const mongoose = DB.mongoose;
@@ -37,18 +38,8 @@ router.get('/register', register)
 .get('/books', getBooks)
 
 //获取最新发布的图书
-.get('/newbooks', (req, res, next) => {
-	BookModel.find({status : true}, (err, books) => {
-		if(err){
-			console.log(err);
-		}else{
-			res.status(200).json({
-				"newPublishedBooks" : books.slice(-6)
-			});
-		}
-	});
-	
-})
+.get('/newbooks', getNewBooks)
+
 //查询书籍可借的状态
 .get('/book/status', (req, res, next) => {
 	let isbn = req.query.isbn;
