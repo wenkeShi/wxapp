@@ -19,6 +19,7 @@ const getPublishBooks = require('../service/getPublishBooks');
 const getBooks = require('../service/getBooks');
 const getNewBooks = require('../service/getNewBooks');
 const getBookStatus require('../service/getBookStatus');
+const getOwnerInfo = require('../servie/getOwnerInfo');
 
 const DB_CONNECTION = DB.connection;
 const mongoose = DB.mongoose;
@@ -45,19 +46,8 @@ router.get('/register', register)
 .get('/book/status', getBookStatus)
 
 //获取书籍主人信息
-.get('/book/ownerInfo',(req, res, next) => {
-		let bookId = req.query.bookId;
-		BookModel.findOne({_id : bookId},(err, book) => {
-			console.log(book);
-			console.log( book.owner+book.ownerImage);
-			res.status(200).json({
-				ownerId : book.ownerId,
-				owner : book.owner,
-				ownerImage : book.ownerImage,
-			});
-			next();
-		});
-})
+.get('/book/ownerInfo',getOwnerInfo)
+
 //获取书主发布的图书
 .get('/owner/publishedbooks', (req, res, next) => {
 	let ownerId = req.query.ownerId;
