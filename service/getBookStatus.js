@@ -1,5 +1,4 @@
 const BookModel = require('../dao/model').BookModel;
-const sessions = require('./session');
 
 module.exports = (req, res, next) => {
 	let isbn = req.query.isbn;
