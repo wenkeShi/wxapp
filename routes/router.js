@@ -20,6 +20,7 @@ const getBooks = require('../service/getBooks');
 const getNewBooks = require('../service/getNewBooks');
 const getBookStatus require('../service/getBookStatus');
 const getOwnerInfo = require('../servie/getOwnerInfo');
+const getOwnerPublished =require('../service/getOwnerPublished');
 
 const DB_CONNECTION = DB.connection;
 const mongoose = DB.mongoose;
@@ -49,21 +50,8 @@ router.get('/register', register)
 .get('/book/ownerInfo',getOwnerInfo)
 
 //获取书主发布的图书
-.get('/owner/publishedbooks', (req, res, next) => {
-	let ownerId = req.query.ownerId;
-	UserModel.findOne({openId : ownerId} , (err, owner) => {
-		if(err){
-			console.log(err);
-		}else{
-			res.status(200).json({
-				"publishedBooks" : owner.publishedBooks
-			});
-			next();
-		}
-	});
-	
-	
-})
+.get('/owner/publishedbooks', getOwnerPublished)
+
 //借阅书籍接口
 .post('/borrowBook',(req, res, next) => {
 	let borrowedBook = req.body;
