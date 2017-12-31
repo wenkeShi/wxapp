@@ -18,6 +18,7 @@ const publish = require('../service/publish');
 const getPublishBooks = require('../service/getPublishBooks');
 const getBooks = require('../service/getBooks');
 const getNewBooks = require('../service/getNewBooks');
+const getBookStatus require('../service/getBookStatus');
 
 const DB_CONNECTION = DB.connection;
 const mongoose = DB.mongoose;
@@ -41,20 +42,7 @@ router.get('/register', register)
 .get('/newbooks', getNewBooks)
 
 //查询书籍可借的状态
-.get('/book/status', (req, res, next) => {
-	let isbn = req.query.isbn;
-	let canBorrow = 0;
-	BookModel.find({isbn:isbn},(err, results) => {
-		results.forEach((book) => {
-		  book.status ? canBorrow++ : null;
-		});
-		res.status(200).json({
-			canBorrow : canBorrow,
-			total : results.length,
-		});
-		next();
-	});
-})
+.get('/book/status', getBookStatus)
 
 //获取书籍主人信息
 .get('/book/ownerInfo',(req, res, next) => {
