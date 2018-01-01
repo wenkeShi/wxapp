@@ -22,6 +22,7 @@ const getBookStatus require('../service/getBookStatus');
 const getOwnerInfo = require('../servie/getOwnerInfo');
 const getOwnerPublished =require('../service/getOwnerPublished');
 const borrow = require('../service/borrow');
+const getBorrowBooks = require('../service/getBorrowBooks');
 
 const DB_CONNECTION = DB.connection;
 const mongoose = DB.mongoose;
@@ -57,19 +58,7 @@ router.get('/register', register)
 .post('/borrowBook',borrow)
 
 //获取借阅的书籍
-.get('/borrowedbooks' , (req, res, next) => {
-	let userId = sessions[req.headers.sessionid];
-	UserModel.findOne({openId : userId} , (err, user) => {
-		if(!err){
-			res.status(200).json({
-				borrowedBooks : user.borrowedBooks,
-			});
-			next();
-		}else{
-			console.log('find user failed!');
-		}
-	});
-})
+.get('/borrowedbooks' , getBorrowBooks)
 
 //新增借阅消息
 .post('/borrowMsg', (req, res, next) => {
