@@ -24,6 +24,7 @@ const getOwnerPublished =require('../service/getOwnerPublished');
 const borrow = require('../service/borrow');
 const getBorrowBooks = require('../service/getBorrowBooks');
 const borrowMsg = require('./service/borrowMsg');
+const getBorrowMsgs = require('./service/getBorrowMsgs');
 
 const DB_CONNECTION = DB.connection;
 const mongoose = DB.mongoose;
@@ -65,15 +66,7 @@ router.get('/register', register)
 .post('/borrowMsg', borrowMsg)
 
 //获取借阅消息
-.get('/message/borrowMsgs', (req, res, next) => {
-	let userId = sessions[req.headers.sessionid];
-	UserModel.findOne({openId : userId} , (err, user) => {
-		res.status(200).json({
-			borrowMessages : user.borrowMessages,
-		});
-		next();
-	});
-})
+.get('/message/borrowMsgs', getBorrowMsgs)
 //同意借阅
 .post('/agree',(req, res, next) => {
 	let body = req.body;
