@@ -23,6 +23,7 @@ const getOwnerInfo = require('../servie/getOwnerInfo');
 const getOwnerPublished =require('../service/getOwnerPublished');
 const borrow = require('../service/borrow');
 const getBorrowBooks = require('../service/getBorrowBooks');
+const borrowMsg = require('./service/borrowMsg');
 
 const DB_CONNECTION = DB.connection;
 const mongoose = DB.mongoose;
@@ -61,32 +62,7 @@ router.get('/register', register)
 .get('/borrowedbooks' , getBorrowBooks)
 
 //新增借阅消息
-.post('/borrowMsg', (req, res, next) => {
-	let userId = sessions[req.headers.sessionid];
-	let msgData = req.body;
-	let targetId = msgData.targetId;
-	msgData.borrowerId = userId;   //前端传了bookid才能save成功？！不知道为什么
-console.log(targetId);
-	UserModel.findOne({openId : targetId}, (err, user) => {
-		if(!err){
-			console.log(user);
-			user.borrowMessages.unshift(msgData);
-			user.markModified('borrowMessages');
-			console.log(user.borrowMessages);
-			user.save((err) => {
-				if(!err){
-					res.status(200).send();
-					next();
-				}else{
-					console.log(err);
-					console.log('save user failed!');
-				}
-			});
-		}else{
-			console.log('find user failed!');
-		}
-	});
-})
+.post('/borrowMsg', borrowMsg)
 
 //获取借阅消息
 .get('/message/borrowMsgs', (req, res, next) => {
