@@ -1,15 +1,5 @@
-const express = require('express');
-const router = express.Router();
-const https = require('https');
-const queryString = require('querystring');
+const router = require('express').Router();
 const bodyParser = require('body-parser');
-
-
-
-
-const DB = require('../dao/db');
-const Model = require('../dao/model');
-const sessions = require('../service/session');
 
 //接口服务
 const register = require('../service/register');
@@ -30,12 +20,9 @@ const reject = require('../service/reject');
 const returnBook = require('../service/returnBook');
 const receiveBook = require('../service/receiveBook');
 
-const DB_CONNECTION = DB.connection;
-const mongoose = DB.mongoose;
-const UserModel = Model.UserModel;
-const BookModel = Model.BookModel;
 
 router.use(bodyParser.json());
+
 router.get('/register', register)
 .get('/login',login)
 
@@ -83,7 +70,6 @@ router.get('/register', register)
 
 //收到书籍
 .post('/receivebook',receiveBook)
-
 
 module.exports = {
 	router : router,
