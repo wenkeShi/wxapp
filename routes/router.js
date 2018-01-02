@@ -27,6 +27,7 @@ const borrowMsg = require('../service/borrowMsg');
 const getBorrowMsgs = require('../service/getBorrowMsgs');
 const agree = require('../service/agree');
 const reject = require('../service/reject');
+const returnBook = require('../service/returnBook');
 
 const DB_CONNECTION = DB.connection;
 const mongoose = DB.mongoose;
@@ -77,26 +78,7 @@ router.get('/register', register)
 .post('/reject', reject)
 
 //归还书籍
-.get('/returnbook', (req, res, next) => {
-	let userId = sessions[req.headers.sessionid];
-	let bookId = req.query.bookId;
-	UserModel.findOne({openId : userId}, (err, user) => {
-		if(!err){
-			for(let i=0;i<user.borrowedBooks.length;i++){
-				if(user.borrowedBooks[i].bookId == bookId){
-			  	user.borrowedBooks[i].borrowingStatus = '归还中';
-			  	break;
-			  }
-			}
-			user.markModified('borrowedBooks');
-			user.save();
-			res.status(200).send();
-			next();
-		}else{
-			console.log(err);
-		}
-	});
-})
+.get('/returnbook', returnBook)
 
 //收到书籍
 .post('/receivebook',(req, res, next) => {
