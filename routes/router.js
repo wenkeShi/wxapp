@@ -26,6 +26,7 @@ const getBorrowBooks = require('../service/getBorrowBooks');
 const borrowMsg = require('../service/borrowMsg');
 const getBorrowMsgs = require('../service/getBorrowMsgs');
 const agree = require('../service/agree');
+const reject = require('../service/reject');
 
 const DB_CONNECTION = DB.connection;
 const mongoose = DB.mongoose;
@@ -72,54 +73,8 @@ router.get('/register', register)
 //同意借阅
 .post('/agree', agree)
 
-
 //拒绝借阅
-.post('/reject', (req, res, next) => {
-	let body = req.body;
-	let userId = sessions[req.headers.sessionid];
-	let bookId = body.bookId;
-	UserModel.findOne({openId : userId}, (err, owner) =>{
-		if(!err){
-			for(let i=0;i<owner.borrowMessages.length;i++){
-				if(owner.borrowMessages[i].bookId == bookId){
-					owner.borrowMessages.splice(i,1);
-					break;
-				}
-			}
-			owner.markModified('borrowMessages');
-			owner.save();
-		}else{
-			console.log(err);
-		}
-	});
-//	UserModel.findOne({openId : body.borrowerId}, (err, borrower) => {
-//		if(!err){
-//			for(let i=0;i<borrower.borrowedBooks.length;i++){
-//				if(borrower.borrowedBooks[i].bookId == bookId){
-//			  	borrower.borrowedBooks[i].borrowingStatus = '借阅失败';
-//			  	break;
-//			  }
-//			}
-//			borrower.markModified('borrowedBooks');
-//			borrower.save();
-//			res.status(200).send();
-//		}else{
-//			console.log(err);
-//		}
-//	});
-	UserModel.update({openId : body.borrowerId, "borrowedBooks.bookId" : bookId}, {$set: {"borrowedBooks.$.borrowingStatus" : '借阅失败' } } ,(err, result) => {
-		if(!err){
-			res.status(200).send();
-			next();
-		}
-	});
-	BookModel.findOne({_id : bookId}, (err, book) => {
-		book.status = true;
-		book.save();
-		res.status(200).send();
-		next();
-	});
-})
+.post('/reject', reject)
 
 //归还书籍
 .get('/returnbook', (req, res, next) => {
