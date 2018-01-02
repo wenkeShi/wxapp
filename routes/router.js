@@ -8,7 +8,7 @@ const publish = require('../service/publish');
 const getPublishBooks = require('../service/getPublishBooks');
 const getBooks = require('../service/getBooks');
 const getNewBooks = require('../service/getNewBooks');
-const getBookStatus require('../service/getBookStatus');
+const getBookStatus = require('../service/getBookStatus');
 const getOwnerInfo = require('../servie/getOwnerInfo');
 const getOwnerPublished =require('../service/getOwnerPublished');
 const borrow = require('../service/borrow');
