@@ -9,7 +9,6 @@ module.exports = (req, res, next) => {
 	UserModel.findOne({openId : userId}, (err, owner) =>{
 		if(!err){
 			for(let i=0;i<owner.publishedBooks.length;i++){
-				console.log('--------------------------------------------------------------------------------------');
 				console.log(owner.publishedBooks[i]._id);
 				console.log(bookId);
 				if(owner.publishedBooks[i]._id == bookId){  //_id是ObjectId类型的
