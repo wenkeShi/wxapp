@@ -12,7 +12,6 @@ module.exports = (req, res, next) => {
 				console.log(owner.publishedBooks[i]._id);
 				console.log(bookId);
 				if(owner.publishedBooks[i]._id == bookId){  //_id是ObjectId类型的
-				console.log('find----------------------------------------------------------------');
 			  	owner.publishedBooks[i].borrower = body.borrower;
 			  	owner.publishedBooks[i].borrowerId = body.borrowerId; //可以考虑加上borrowId
 				owner.publishedBooks.unshift(owner.publishedBooks.splice(i,1)[0]); //将被借阅的书籍调到借阅书籍最前
