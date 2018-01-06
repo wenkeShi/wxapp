@@ -54,7 +54,6 @@ module.exports = (req, res, next) => {
 	//		console.log(err);
 	//	}
 	//});
-	//UserModel.findOne
 	UserModel.update({openId : body.borrowerId, "borrowedBooks.bookId" : bookId}, {$set: {"borrowedBooks.$.borrowingStatus" : '借阅中' } } ,(err, result) => {
 		if(!err){
 			res.status(200).send();
