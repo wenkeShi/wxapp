@@ -40,6 +40,5 @@ module.exports = (httpServer) => {
 	        console.log(msg);
 					//ws.send('you send '+msg);
 	    });
-	    //ws.send('hello');
 	});
 };
