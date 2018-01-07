@@ -1,5 +1,4 @@
 const Model = require('../dao/model');
-// const queryString = require('querystring');
 const sessions = require('./session');
 
 const UserModel = Model.UserModel;
