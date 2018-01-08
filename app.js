@@ -6,7 +6,6 @@ const bodyParser = require('body-parser');
 const app = express();
 const queryString = require('querystring');
 const URL = require('url');
-// const WebSocket = require('ws');
 const socket = require('./service/socket');
 
 const router = require('./routes/router').router;
@@ -89,6 +88,5 @@ app.use(router);
 // 	console.log(req.query);
 // 	res.json({"code" : req.query});
 // });
-
 
 
