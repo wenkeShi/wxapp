@@ -11,8 +11,6 @@ const socket = require('./service/socket');
 
 const router = require('./routes/router').router;
 
-// var http = require('http');
-
 //获取认证证书
 var key = fs.readFileSync('./key/2_www.liudongtushuguan.cn.key');
 var cert = fs.readFileSync('./key/1_www.liudongtushuguan.cn_bundle.crt');
