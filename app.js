@@ -88,5 +88,3 @@ app.use(router);
 // 	console.log(req.query);
 // 	res.json({"code" : req.query});
 // });
-
-
