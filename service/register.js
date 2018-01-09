@@ -56,7 +56,4 @@ module.exports = (req, res, next) => {
 			}
 		});
 		wxReq.end();
-	//res.status(200);
-	//res.type('application/json');
-	// }
 };
