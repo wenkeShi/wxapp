@@ -36,7 +36,6 @@ module.exports = (req, res, next) => {
 	//	if(!err){
 	//		for(let i=0;i<borrower.borrowedBooks.length;i++){
 	//			if(borrower.borrowedBooks[i].bookId == bookId){
-	//			console.log('--------------------------------------------borrowedBooks')
 	//			borrower.borrowedBooks[i].borrowingStatus = '借阅中';
 	//		  	borrower.borrowedBooks.set(i,borrower.borrowedBooks[i]);
 	//			//borrower.markModified('borrowedBooks');
