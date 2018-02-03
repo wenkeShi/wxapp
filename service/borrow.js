@@ -41,9 +41,7 @@ module.exports = (req, res, next) => {
 				error : '已被借阅'
 			});
 			next();
-			//console.log('find book failed!');
 			return;
 		}
-	});
-			
+	});		
 }

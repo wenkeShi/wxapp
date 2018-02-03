@@ -1,5 +1,4 @@
 const Model = require('../dao/model');
-// const queryString = require('querystring');
 const sessions = require('./session');
 
 const UserModel = Model.UserModel;
@@ -30,7 +29,7 @@ module.exports = (req, res, next) => {
 			// let UserModel = mongoose.model('user',userSchema);
 			let sessionId = req.headers.sessionid;
 			let openId = sessions[sessionId];
-			console.log('sessions----------------'+sessions[sessionId]);
+			//console.log('sessions----------------'+sessions[sessionId]);
 			UserModel.find({openId:openId}, (err,results) => {
 				if(results.length == 0){
 					  let user = new UserModel();

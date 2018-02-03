@@ -7,12 +7,9 @@ const bodyParser = require('body-parser');
 const app = express();
 const queryString = require('querystring');
 const URL = require('url');
-// const WebSocket = require('ws');
 const socket = require('./service/socket');
 
 const router = require('./routes/router').router;
-
-// var http = require('http');
 
 //获取认证证书
 // var key = fs.readFileSync('./key/2_www.liudongtushuguan.cn.key');
@@ -94,6 +91,3 @@ app.use(router);
 // 	console.log(req.query);
 // 	res.json({"code" : req.query});
 // });
-
-
-

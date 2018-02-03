@@ -1,15 +1,5 @@
-const express = require('express');
-const router = express.Router();
-const https = require('https');
-const queryString = require('querystring');
+const router = require('express').Router();
 const bodyParser = require('body-parser');
-
-
-
-
-const DB = require('../dao/db');
-const Model = require('../dao/model');
-const sessions = require('../service/session');
 
 //接口服务
 const register = require('../service/register');
@@ -18,21 +8,21 @@ const publish = require('../service/publish');
 const getPublishBooks = require('../service/getPublishBooks');
 const getBooks = require('../service/getBooks');
 const getNewBooks = require('../service/getNewBooks');
-const getBookStatus require('../service/getBookStatus');
-const getOwnerInfo = require('../servie/getOwnerInfo');
+const getBookStatus = require('../service/getBookStatus');
+const getOwnerInfo = require('../service/getOwnerInfo');
 const getOwnerPublished =require('../service/getOwnerPublished');
 const borrow = require('../service/borrow');
 const getBorrowBooks = require('../service/getBorrowBooks');
 const borrowMsg = require('../service/borrowMsg');
 const getBorrowMsgs = require('../service/getBorrowMsgs');
 const agree = require('../service/agree');
+const reject = require('../service/reject');
+const returnBook = require('../service/returnBook');
+const receiveBook = require('../service/receiveBook');
 
-const DB_CONNECTION = DB.connection;
-const mongoose = DB.mongoose;
-const UserModel = Model.UserModel;
-const BookModel = Model.BookModel;
 
 router.use(bodyParser.json());
+
 router.get('/register', register)
 .get('/login',login)
 
@@ -72,128 +62,14 @@ router.get('/register', register)
 //同意借阅
 .post('/agree', agree)
 
-
 //拒绝借阅
-.post('/reject', (req, res, next) => {
-	let body = req.body;
-	let userId = sessions[req.headers.sessionid];
-	let bookId = body.bookId;
-	UserModel.findOne({openId : userId}, (err, owner) =>{
-		if(!err){
-			for(let i=0;i<owner.borrowMessages.length;i++){
-				if(owner.borrowMessages[i].bookId == bookId){
-					owner.borrowMessages.splice(i,1);
-					break;
-				}
-			}
-			owner.markModified('borrowMessages');
-			owner.save();
-		}else{
-			console.log(err);
-		}
-	});
-//	UserModel.findOne({openId : body.borrowerId}, (err, borrower) => {
-//		if(!err){
-//			for(let i=0;i<borrower.borrowedBooks.length;i++){
-//				if(borrower.borrowedBooks[i].bookId == bookId){
-//			  	borrower.borrowedBooks[i].borrowingStatus = '借阅失败';
-//			  	break;
-//			  }
-//			}
-//			borrower.markModified('borrowedBooks');
-//			borrower.save();
-//			res.status(200).send();
-//		}else{
-//			console.log(err);
-//		}
-//	});
-	UserModel.update({openId : body.borrowerId, "borrowedBooks.bookId" : bookId}, {$set: {"borrowedBooks.$.borrowingStatus" : '借阅失败' } } ,(err, result) => {
-		if(!err){
-			res.status(200).send();
-			next();
-		}
-	});
-	BookModel.findOne({_id : bookId}, (err, book) => {
-		book.status = true;
-		book.save();
-		res.status(200).send();
-		next();
-	});
-})
+.post('/reject', reject)
 
 //归还书籍
-.get('/returnbook', (req, res, next) => {
-	let userId = sessions[req.headers.sessionid];
-	let bookId = req.query.bookId;
-	UserModel.findOne({openId : userId}, (err, user) => {
-		if(!err){
-			for(let i=0;i<user.borrowedBooks.length;i++){
-				if(user.borrowedBooks[i].bookId == bookId){
-			  	user.borrowedBooks[i].borrowingStatus = '归还中';
-			  	break;
-			  }
-			}
-			user.markModified('borrowedBooks');
-			user.save();
-			res.status(200).send();
-			next();
-		}else{
-			console.log(err);
-		}
-	});
-})
+.get('/returnbook', returnBook)
 
 //收到书籍
-.post('/receivebook',(req, res, next) => {
-	let userId = sessions[req.headers.sessionid];
-	let body = req.body;
-	let bookId = body.bookId;
-	let borrowerId = body.borrowerId;
-	UserModel.findOne({openId : userId}, (err, owner) =>{
-		if(!err){
-			for(let i=0;i<owner.publishedBooks.length;i++){
-				if(owner.publishedBooks[i]._id == bookId){
-			  	owner.publishedBooks[i].borrower = '';
-			  	owner.publishedBooks[i].borrowerId = ''; //可以考虑加上borrowId
-			  	break;
-			  }
-			}
-			owner.markModified('publishedBooks');
-			owner.save();
-		}else{
-			console.log(err);
-		}
-	});
-//	UserModel.findOne({openId : borrowerId}, (err, borrower) => {
-//		if(!err){
-//			for(let i=0;i<borrower.borrowedBooks.length;i++){
-//				if(borrower.borrowedBooks[i].bookId == bookId){
-//			  	borrower.borrowedBooks[i].borrowingStatus = '已归还';
-//			  	break;
-//			  }
-//			}
-//			borrower.markModified('borrowedBooks');
-//			borrower.save();
-//			res.status(200).send();
-//			next();
-//		}else{
-//			console.log(err);
-//		}
-//	});
-	UserModel.update({openId : borrowerId, "borrowedBooks.bookId" : bookId}, {$set: {"borrowedBooks.$.borrowingStatus" : '已归还' } } ,(err, result) => {
-		if(!err){
-			res.status(200).send();
-			next();
-		}
-	});
-	BookModel.findOne({_id : bookId}, (err, book) => {
-		book.status = true;
-		book.save();
-		res.status(200).send();
-		next();
-	});
-})
-
+.post('/receivebook',receiveBook)
 
 module.exports = {
 	router : router,

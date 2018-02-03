@@ -9,11 +9,9 @@ module.exports = (req, res, next) => {
 	UserModel.findOne({openId : userId}, (err, owner) =>{
 		if(!err){
 			for(let i=0;i<owner.publishedBooks.length;i++){
-				console.log('--------------------------------------------------------------------------------------');
 				console.log(owner.publishedBooks[i]._id);
 				console.log(bookId);
 				if(owner.publishedBooks[i]._id == bookId){  //_id是ObjectId类型的
-				console.log('find----------------------------------------------------------------');
 			  	owner.publishedBooks[i].borrower = body.borrower;
 			  	owner.publishedBooks[i].borrowerId = body.borrowerId; //可以考虑加上borrowId
 				owner.publishedBooks.unshift(owner.publishedBooks.splice(i,1)[0]); //将被借阅的书籍调到借阅书籍最前
@@ -38,7 +36,6 @@ module.exports = (req, res, next) => {
 	//	if(!err){
 	//		for(let i=0;i<borrower.borrowedBooks.length;i++){
 	//			if(borrower.borrowedBooks[i].bookId == bookId){
-	//			console.log('--------------------------------------------borrowedBooks')
 	//			borrower.borrowedBooks[i].borrowingStatus = '借阅中';
 	//		  	borrower.borrowedBooks.set(i,borrower.borrowedBooks[i]);
 	//			//borrower.markModified('borrowedBooks');
@@ -56,7 +53,6 @@ module.exports = (req, res, next) => {
 	//		console.log(err);
 	//	}
 	//});
-	//UserModel.findOne
 	UserModel.update({openId : body.borrowerId, "borrowedBooks.bookId" : bookId}, {$set: {"borrowedBooks.$.borrowingStatus" : '借阅中' } } ,(err, result) => {
 		if(!err){
 			res.status(200).send();

@@ -30,7 +30,6 @@ module.exports = (req, res, next) => {
 	// 	sessions[sessionId] = sessionId;
 	// 	next();
 	// }else{
-		// console.log('no sessionid');
 		let code = req.query.code;
 		console.log(code );
 		let otherRes = res;
@@ -57,7 +56,4 @@ module.exports = (req, res, next) => {
 			}
 		});
 		wxReq.end();
-	//res.status(200);
-	//res.type('application/json');
-	// }
 };
