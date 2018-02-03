@@ -1,4 +1,5 @@
-const https = require('https');
+// const https = require('https');
+const https = require('http');
 const fs = require('fs');
 const express = require('express')
 const cookieParser = require('cookie-parser');
@@ -14,13 +15,13 @@ const router = require('./routes/router').router;
 // var http = require('http');
 
 //获取认证证书
-var key = fs.readFileSync('./key/2_www.liudongtushuguan.cn.key');
-var cert = fs.readFileSync('./key/1_www.liudongtushuguan.cn_bundle.crt');
+// var key = fs.readFileSync('./key/2_www.liudongtushuguan.cn.key');
+// var cert = fs.readFileSync('./key/1_www.liudongtushuguan.cn_bundle.crt');
 
-var options = {
-	key : key,
-	cert : cert,
-};
+// var options = {
+// 	key : key,
+// 	cert : cert,
+// };
 
 //配置小程序二维码生成文件
 app.use('/index', express.static('index'));
@@ -28,8 +29,10 @@ app.use('/index', express.static('index'));
 app.use(cookieParser());
 app.use(bodyParser.json());
 
-const httpsServer = https.createServer(options,app);
-httpsServer.listen(443,() =>{
+// const httpsServer = https.createServer(options,app);
+const httpsServer = https.createServe(app);
+
+httpsServer.listen(8080,() =>{
 	console.log('listening 443 port');
 });
 
